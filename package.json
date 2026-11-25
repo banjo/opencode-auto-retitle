@@ -1,6 +1,6 @@
 {
   "name": "opencode-auto-retitle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenCode plugin that keeps session titles current as long sessions change topic",
   "license": "MIT",
   "author": "Anton Ödman",
