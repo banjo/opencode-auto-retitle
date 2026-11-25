@@ -117,7 +117,7 @@ const clean = (text: string) =>
     .slice(0, MAX_TITLE)
 
 export default Plugin.define({
-  id: "retitle",
+  id: "auto-retitle",
   async setup(ctx) {
     const options = readOptions(ctx.options)
     const counterKey = (sessionID: string) => `count/${sessionID}`

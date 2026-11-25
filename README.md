@@ -1,9 +1,9 @@
-# opencode-retitle
+# opencode-auto-retitle
 
 An [OpenCode](https://opencode.ai) plugin that keeps session titles current when a long session changes topic.
 
 OpenCode names a session from its first message. Three hours and two topics later, the title still describes where
-you started. opencode-retitle has a cheap model check the title as you work, and renames the session when the topic
+you started. opencode-auto-retitle has a cheap model check the title as you work, and renames the session when the topic
 has clearly moved on.
 
 ## Highlights
@@ -24,7 +24,7 @@ You need [OpenCode](https://opencode.ai) 2.2 or later and a small model, such as
 {
   "plugins": [
     {
-      "package": "github:banjo/opencode-retitle",
+      "package": "opencode-auto-retitle",
       "options": {
         "models": ["anthropic/claude-haiku-4-5"],
         "everyMessages": 15,

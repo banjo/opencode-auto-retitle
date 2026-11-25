@@ -6,7 +6,7 @@ Options go in the plugin's `options` in `opencode.json(c)`:
 {
   "plugins": [
     {
-      "package": "github:banjo/opencode-retitle",
+      "package": "opencode-auto-retitle",
       "options": {
         "models": ["anthropic/claude-haiku-4-5", "openai/gpt-5.4-mini"],
         "onCompaction": true,
