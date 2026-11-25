@@ -8,6 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/banjo/opencode-auto-retitle.git"
   },
+  "homepage": "https://github.com/banjo/opencode-auto-retitle#readme",
   "keywords": ["opencode", "opencode-plugin"],
   "type": "module",
   "exports": {
@@ -15,12 +16,24 @@
   },
   "files": ["src"],
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "changeset": "changeset"
   },
   "dependencies": {
     "@opencode/plugin": "^2.2.5"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "typescript": "^5.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.21.0",
+      "onFail": "download"
+    }
   }
 }

@@ -45,12 +45,14 @@ OpenCode installs and loads it on save. Then, in any session:
 ## Documentation
 
 - [Configuration](docs/configuration.md): every option, and when the checks run.
+- [Releasing](RELEASE.md): changesets and publishing to npm.
 
 ## Development
 
 ```sh
 pnpm install
 pnpm typecheck            # Type-check the plugin.
+pnpm changeset            # Describe a change for the changelog.
 ```
 
 To try local changes, set `package` to the absolute path of your checkout.
