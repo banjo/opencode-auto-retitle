@@ -19,24 +19,35 @@ Options go in the plugin's `options` in `opencode.json(c)`:
 }
 ```
 
-| Option          | Default     | Description                                                                                  |
-| --------------- | ----------- | -------------------------------------------------------------------------------------------- |
-| `models`        | none        | Required. `provider/model`, or a list of them. The first one that is available is used.     |
-| `onCompaction`  | `true`      | Check the title after each compaction.                                                       |
-| `everyMessages` | `0`         | Check the title every N of your messages. `0` turns it off.                                  |
-| `language`      | `"English"` | Language of the titles, or `"auto"`.                                                         |
-| `maxWords`      | `6`         | Longest title, in words.                                                                     |
-| `recentChars`   | `20000`     | How much of the recent conversation the model reads, in characters.                         |
-| `pinManual`     | `true`      | Never change a title set with `/retitle <title>` automatically.                             |
+| Option             | Default     | Description                                                                             |
+| ------------------ | ----------- | --------------------------------------------------------------------------------------- |
+| `models`           | none        | Required. `provider/model`, or a list of them. The first one that is available is used. |
+| `onCompaction`     | `true`      | Check the title after each compaction.                                                  |
+| `everyMessages`    | `0`         | Check the title every N of your messages. `0` turns it off.                             |
+| `language`         | `"English"` | Language of the titles, or `"auto"`.                                                    |
+| `maxWords`         | `6`         | Longest title, in words.                                                                |
+| `firstMessages`    | `3`         | How many of your first messages the model reads, to see what the session is for.        |
+| `recentMessages`   | `6`         | How many of the latest messages (yours and the agent's replies) the model reads.        |
+| `languageMessages` | `5`         | With `language: "auto"`, how many of your latest messages decide the language.          |
+| `pinManual`        | `true`      | Never change a title set with `/retitle <title>` automatically.                         |
 
 A list of models lets one config work on machines with different providers.
 
 ## When the title is checked
 
-- **After compaction**, the model reads the compaction summary.
-- **Every N messages**, the check runs once the turn has ended, so the model reads your message and the answer. It
-  reads the messages since the last compaction, up to `recentChars`. When they don't fit, it keeps the compaction
-  summary and the first message, which say what the session is for, and the newest messages. Tool output is left out.
+- **After each compaction**, with the summary the compaction just wrote.
+- **Every N messages**, once the turn has ended, so the model sees your message and the answer.
+
+## What the model reads
+
+Each check reads three parts of the session, and never tool calls or their output:
+
+- **The start:** your first messages (`firstMessages`), which say what the session is for. The plugin keeps them as
+  you send them, since compaction drops them from the session.
+- **The summary** of the last compaction, if there is one.
+- **The latest messages** (`recentMessages`): yours, and the text of the agent's replies.
+
+That is a few thousand tokens, so a check with a small model costs a fraction of a cent.
 
 A title names the work as a whole, like a ticket or a branch: "Calendar migration to Vite", not "Vite build passes".
 The model replies `KEEP` unless the session has moved on to different work, so most checks change nothing. A session
@@ -46,12 +57,12 @@ The message counter restarts after every check, compaction and rename.
 
 ## Language
 
-With `"auto"`, the title follows the language of your three latest messages. Code, quotes and the agent's replies don't
+With `"auto"`, the title follows the language of your latest messages (`languageMessages`, five by default). Code, quotes and the agent's replies don't
 count. When your messages are mixed or too short to tell, the title keeps the language it has.
 
 ## Commands
 
-- `/retitle` writes a new title from the recent messages, and unpins the title.
+- `/retitle` writes a new title, from the same parts of the session as a check, and unpins the title.
 - `/retitle <title>` sets the title. With `pinManual` on, automatic checks leave it alone until the next `/retitle`
   without a title.
 

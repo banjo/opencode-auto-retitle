@@ -9,7 +9,8 @@ has clearly moved on.
 ## Highlights
 
 - 🔄 Titles follow the work: checked after every compaction, every N messages, or both.
-- 🪙 Costs a fraction of a cent per check: a small model reads the summary or your recent messages, never tool output.
+- 🪙 Costs a fraction of a cent per check: a small model reads how the session started, the last compaction summary and
+  the latest messages, never tool output.
 - 🧘 Leaves good titles alone: the model replies `KEEP` unless the topic has clearly changed, not for a short detour.
 - ⌨️ `/retitle` renames the session now, and `/retitle <title>` sets a title that is never changed automatically.
 - 🌍 Titles in your language: `"auto"` follows what you write, or set one such as `"English"`.
