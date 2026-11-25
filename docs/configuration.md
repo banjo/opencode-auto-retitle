@@ -35,10 +35,14 @@ A list of models lets one config work on machines with different providers.
 
 - **After compaction**, the model reads the compaction summary.
 - **Every N messages**, the check runs once the turn has ended, so the model reads your message and the answer. It
-  reads the messages since the last compaction, the newest `recentChars` of them. Tool output is left out.
+  reads the messages since the last compaction, up to `recentChars`. When they don't fit, it keeps the compaction
+  summary and the first message, which say what the session is for, and the newest messages. Tool output is left out.
 
-The message counter restarts after every check, compaction and rename. The model replies `KEEP` unless the topic has
-clearly moved on, so most checks change nothing.
+A title names the work as a whole, like a ticket or a branch: "Calendar migration to Vite", not "Vite build passes".
+The model replies `KEEP` unless the session has moved on to different work, so most checks change nothing. A session
+with no messages to go on keeps its title.
+
+The message counter restarts after every check, compaction and rename.
 
 ## Language
 
