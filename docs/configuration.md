@@ -45,20 +45,27 @@ Each check reads three parts of the session, and never tool calls or their outpu
 - **The start:** your first messages (`firstMessages`), which say what the session is for. The plugin keeps them as
   you send them, since compaction drops them from the session.
 - **The summary** of the last compaction, if there is one.
-- **The latest messages** (`recentMessages`): yours, and the text of the agent's replies.
+- **The latest messages** (`recentMessages`): yours, and the text of the agent's replies. Your latest messages are also
+  kept as you send them, so a check right after a compaction still sees them.
 
 That is a few thousand tokens, so a check with a small model costs a fraction of a cent.
 
 A title names the work as a whole, like a ticket or a branch: "Calendar migration to Vite", not "Vite build passes".
-The model replies `KEEP` unless the session has moved on to different work, so most checks change nothing. A session
-with no messages to go on keeps its title.
+The model writes the title it would give the session, then keeps the current one if it names the same work and is a
+good title. A new step, fix or release doesn't change it; a title like "Plugin is live" or "New session" is replaced.
+Most checks change nothing. A session with no messages to go on keeps its title.
 
 The message counter restarts after every check, compaction and rename.
 
 ## Language
 
-With `"auto"`, the title follows the language of your latest messages (`languageMessages`, five by default). Code, quotes and the agent's replies don't
-count. When your messages are mixed or too short to tell, the title keeps the language it has.
+With `"auto"`, the title follows the language of your latest messages (`languageMessages`, five by default). Code,
+quotes and the agent's replies don't count. When your messages are mixed or too short to tell, the title keeps the
+language it has.
+
+Small models tend to write titles in English whatever they are asked, so the model writes the title in English and
+names your language, and a second call translates it. Names of products and code stay as they are. A kept title in
+another language is translated too, so a session that switches language gets its title in the new one.
 
 ## Commands
 
