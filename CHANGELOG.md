@@ -1,5 +1,12 @@
 # opencode-auto-retitle
 
+## 0.1.3
+
+### Patch Changes
+
+- 677d8c4: Falls back to the session's own model when none of `models` is available or a call fails, so titles still update when
+  a provider is down. `models` is no longer required.
+
 ## 0.1.2
 
 ### Patch Changes
