@@ -21,7 +21,7 @@ Options go in the plugin's `options` in `opencode.json(c)`:
 
 | Option             | Default     | Description                                                                             |
 | ------------------ | ----------- | --------------------------------------------------------------------------------------- |
-| `models`           | none        | Required. `provider/model`, or a list of them. The first one that is available is used. |
+| `models`           | none        | `provider/model`, or a list. The first that works is used, else the session's model.    |
 | `onCompaction`     | `true`      | Check the title after each compaction.                                                  |
 | `everyMessages`    | `0`         | Check the title every N of your messages. `0` turns it off.                             |
 | `language`         | `"English"` | Language of the titles, or `"auto"`.                                                    |
@@ -31,7 +31,9 @@ Options go in the plugin's `options` in `opencode.json(c)`:
 | `languageMessages` | `5`         | With `language: "auto"`, how many of your latest messages decide the language.          |
 | `pinManual`        | `true`      | Never change a title set with `/retitle <title>` automatically.                         |
 
-A list of models lets one config work on machines with different providers.
+A list of models lets one config work on machines with different providers. If none of them is available, or a call
+fails, the check falls back to the model the session uses (without its variant), so titles still update when a
+provider is down. Leave `models` out to always use the session's model.
 
 ## When the title is checked
 

@@ -5,7 +5,13 @@ import { Plugin, type PluginOptions } from "@opencode/plugin"
 // `/retitle <title>` sets it. See docs/configuration.md for the options.
 
 type ModelRef = { providerID: string; id: string; variant?: string }
-type Session = { id: string; parentID?: string; title?: string; location: { directory: string } }
+type Session = {
+  id: string
+  parentID?: string
+  title?: string
+  model?: { providerID: string; id: string }
+  location: { directory: string }
+}
 type Message = { type: string; text?: unknown; summary?: unknown; content?: unknown }
 type Stored = { id: string; text: string }
 
@@ -213,22 +219,39 @@ export default Plugin.define({
     const latestKey = (sessionID: string) => `latest/${sessionID}`
     const running = new Set<string>()
 
-    // First available candidate, so one config works on machines with different providers.
-    const pickModel = async () => {
-      if (options.models.length < 2) return options.models[0]
+    // The available configured models in order, so one config works on machines with different providers, then the
+    // session's own model, without its variant, for when none of them is available or works.
+    const candidates = async (session: Session) => {
       const available = new Set((await ctx.model.list()).data.map((model) => `${model.providerID}/${model.id}`))
-      return options.models.find((model) => available.has(`${model.providerID}/${model.id}`))
+      const configured = options.models.filter((model) => available.has(`${model.providerID}/${model.id}`))
+      const own = session.model && { providerID: session.model.providerID, id: session.model.id }
+      const isConfigured = own && configured.some((model) => model.providerID === own.providerID && model.id === own.id)
+      return own && !isConfigured ? [...configured, own] : configured
     }
 
-    const ask = async (prompt: string) => {
-      const model = await pickModel()
-      if (!model) throw new Error("no model available, set options.models")
-      return (await ctx.experimental.generate.text({ model, prompt })).text
+    // Asks the first model that answers, and keeps asking it for the rest of the check.
+    const asker = (models: ModelRef[]) => {
+      let next = 0
+      return async (prompt: string) => {
+        if (!models.length) throw new Error("no model available, set options.models")
+        let failure: unknown
+        for (let index = next; index < models.length; index++) {
+          try {
+            const text = (await ctx.experimental.generate.text({ model: models[index], prompt })).text
+            next = index
+            return text
+          } catch (error) {
+            failure = error
+          }
+        }
+        throw failure
+      }
     }
 
     // The new title from a JUDGE or WRITE prompt, in the right language, or undefined to keep the current one. A kept
     // title in another language is translated.
-    const decide = async (prompt: string, current: string) => {
+    const decide = async (session: Session, prompt: string, current: string) => {
+      const ask = asker(await candidates(session))
       const answer = await ask(prompt)
       const language = isAuto(options) ? field(answer, "Language") : options.language
       const proposed = clean(field(answer, "Title") ?? answer)
@@ -275,7 +298,7 @@ export default Plugin.define({
         if (!material.text) return
         const current = session.title ?? ""
         const prompt = isPlaceholder(current) ? WRITE : JUDGE
-        const title = await decide(prompt(options, material.userText, current, material.text), current)
+        const title = await decide(session, prompt(options, material.userText, current, material.text), current)
         if (title) await rename(sessionID, title, false)
       } finally {
         running.delete(sessionID)
@@ -295,7 +318,7 @@ export default Plugin.define({
           const material = await read(sessionID)
           if (!material.text) return
           const current = session.title ?? ""
-          const title = await decide(WRITE(options, material.userText, current, material.text), current)
+          const title = await decide(session, WRITE(options, material.userText, current, material.text), current)
           if (title) await rename(sessionID, title, false)
         },
       })
